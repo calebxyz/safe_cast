@@ -8,11 +8,11 @@ I have created this small utility header file so that this will be possible.
 You may use bit_cast from this header almost for any type 
 
 Example:
-float fx = 5.235;
+'''float fx = 5.235;'''
 
 old way:
-auto ux = static_cast<uint64_t>(*reinterpret_cast<uint32_t*>(&fx));
-auto ux2 = *reinterpret_cast<uint64_t*>(&dx);
+'''auto ux = static_cast<uint64_t>(*reinterpret_cast<uint32_t*>(&fx));
+auto ux2 = *reinterpret_cast<uint64_t*>(&dx);'''
 
 New Way:
-auto bx = bits::bit_cast<uint64_t>(fx);
+'''auto bx = bits::bit_cast<uint64_t>(fx);'''
