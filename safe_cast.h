@@ -103,7 +103,7 @@ constexpr To bit_cast_size(From from) requires (not equal_size<To, From>)
 {
   //if both are integral all we want is to get the bits we need extend zeroext them or just cut them
   //we will never want to sign extend because that will change the bits
-  return std::bit_cast<To>(static_cast<std::make_unsigned_t<To>>(from));
+  return std::bit_cast<To>(static_cast<std::make_unsigned_t<To>>(static_cast<std::make_unsigned_t<From>>(from)));
 }
 
 template <integral_bool To, arithmetic_not_bool From>
