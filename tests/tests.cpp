@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <bit_utils/bit_utils.h>
+#include <safe_cast.h>
 
 TEST(BIT_CAST, pointer){
     uint64_t x = 100;
@@ -100,12 +100,14 @@ TEST(BIT_CAST, bool){
     int64_t b1 = 0xf6;
     bool b2 = *reinterpret_cast<bool*>(&b1);
     bool b3 = bits::bit_cast<bool>(b1);
-    EXPECT_EQ(b2, b3);
+    EXPECT_TRUE(b2);
+    EXPECT_TRUE(b3);
 
     uint32_t b4 = 0xdeadbeef;
     b2 = *reinterpret_cast<bool*>(&b4);
     b3 = bits::bit_cast<bool>(b4);
-    EXPECT_EQ(b2, b3);
+    EXPECT_TRUE(b2);
+    EXPECT_TRUE(b3);
 
     bool b5 = 0xbeef;
     auto utmp = static_cast<uint64_t>(b5);
