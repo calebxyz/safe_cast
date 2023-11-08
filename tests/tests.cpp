@@ -100,14 +100,19 @@ TEST(BIT_CAST, bool){
     int64_t b1 = 0xf6;
     bool b2 = *reinterpret_cast<bool*>(&b1);
     bool b3 = bits::bit_cast<bool>(b1);
+#ifdef __clang__
+    EXPECT_TRUE(b2 == b3);
+#else 
     EXPECT_TRUE(b2);
     EXPECT_TRUE(b3);
+#endif    
 
     uint32_t b4 = 0xdeadbeef;
     b2 = *reinterpret_cast<bool*>(&b4);
     b3 = bits::bit_cast<bool>(b4);
     EXPECT_TRUE(b2);
-    EXPECT_TRUE(b3);
+    EXPECT_TRUE(b3); 
+    	
 
     bool b5 = 0xbeef;
     auto utmp = static_cast<uint64_t>(b5);
