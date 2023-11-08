@@ -1,6 +1,3 @@
-Certainly! Here's a possible README.md content for your GitHub project explaining safe reinterpreted casts with `std::bit_cast`:
-
----
 
 # Safe Reinterpreted Casts with `std::bit_cast`
 
