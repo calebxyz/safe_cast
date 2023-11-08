@@ -1,7 +1,3 @@
-/*
- * used from https://github.com/calebxyz/safe_cast
- */
-
 #pragma once
 
 #include <stdint.h>
