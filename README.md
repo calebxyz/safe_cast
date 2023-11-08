@@ -31,8 +31,6 @@ With our utility header, you can perform this type conversion safely and efficie
 
 - **Safety**: Our `bit_cast` extension ensures that you can safely reinterpret-cast between types of different sizes, reducing the risk of undefined behavior in your code.
 
-- **Efficiency**: The extension is designed for optimal performance, so you can confidently use it in your high-performance applications.
-
 - **Constexpr**: `bit_cast` is marked as `constexpr`, allowing you to use it in compile-time expressions.
 
 ## Getting Started
