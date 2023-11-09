@@ -57,6 +57,3 @@ We welcome contributions from the community to improve and expand this utility. 
 
 This utility is provided under the [APACHE License](LICENSE), so you are free to use it in your projects and contribute to its development.
 
----
-
-Feel free to customize the README content to suit your project's specific details and structure.
