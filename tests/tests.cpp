@@ -139,6 +139,42 @@ TEST(BIT_CAST, bool){
     EXPECT_EQ(f2, f3);
 }
 
+TEST(BIT_CAST, to_byte_array){
+    uint64_t a = 0xdeadbeef;
+    auto b = bits::bit_cast<16>(a);
+    EXPECT_EQ(std::memcmp(&a, b.data(), 4), 0);
+
+    uint8_t c = 0xab;
+    auto d = bits::bit_cast<1>(c);
+    EXPECT_EQ(std::memcmp(&c, d.data(), 1), 0);
+
+    auto e = bits::bit_cast<16, 8>(a);
+    EXPECT_EQ(std::memcmp(&a, e.data()+8, 4), 0);
+}
+
+TEST(BIT_CAST, from_byte_array){
+    std::array<unsigned char, 8> a{0, 0, 0, 0, 0xde, 0xad, 0xbe, 0xef};
+    std::array<std::byte, 4> b{std::byte(1), std::byte(2), std::byte(3), std::byte(4)};
+    std::array<std::byte, 8> c{std::byte(222), std::byte(222), std::byte(222), std::byte(222), std::byte(1), std::byte(2), std::byte(3), std::byte(4)};
+
+    auto d = bits::bit_cast<uint64_t, 0>(a);
+    EXPECT_EQ(std::memcmp(a.data(), &d, 4), 0);
+
+    auto e = bits::bit_cast<uint32_t, 0>(b);
+    EXPECT_EQ(std::memcmp(b.data(), &e, 4), 0);
+
+    auto f = bits::bit_cast<uint16_t, 6>(c);
+    EXPECT_EQ(std::memcmp(c.data()+6, &f, 2), 0);
+
+    unsigned char x[2] = {1, 2};
+    auto y = bits::bit_cast<int16_t>(x);
+    EXPECT_EQ(std::memcmp(x, &y, 2), 0);
+
+    std::array<char, 1> z{1};
+    auto zz = bits::bit_cast<uint8_t, 0, char, 1>(z.data());
+    EXPECT_EQ(z[0], zz);
+}
+
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

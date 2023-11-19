@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <bit>
 #include <concepts>
+#include <cstring>
+#include <array>
 
 namespace bits{
 
@@ -18,6 +20,7 @@ concept equal_size = sizeof(T1) == sizeof(T2);
 
 template <typename T>
 concept pointer = std::is_pointer_v<T>;
+
 template <typename T>
 concept not_pointer = not std::is_pointer_v<T>;
 
@@ -30,6 +33,12 @@ concept integral_not_bool = std::integral<T> and (not std::same_as<T, bool>);
 template <typename T>
 concept arithmetic_not_bool = std::is_arithmetic_v<T> and (not std::same_as<T, bool>);
 
+template <typename T>
+concept byte_type = std::same_as<std::decay_t<T>, std::byte> or std::same_as<std::decay_t<T>, char> or
+        std::same_as<std::decay_t<T>, unsigned char>;
+
+template <typename T, typename B, size_t N>
+concept byte_type_array = byte_type<B> and (std::same_as<B[N], T> or std::same_as<std::array<B, N>, T>);
 
 
 namespace details {
@@ -148,11 +157,69 @@ constexpr To bit_cast(auto from) {
   return bit_cast_size<std::decay_t<To>, std::decay_t<decltype(from)>>(from);
 }
 
+template <typename From, byte_type To, std::size_t N>
+union copy_union{
+    constexpr explicit copy_union(From f): from{f} {};
+    const From from = 0;
+    To bytes[N];
+};
+
+template <std::size_t N, byte_type To>
+void byte_copy(To* to, not_pointer auto from){
+    copy_union<decltype(from), std::decay_t<To>, N> u(from);
+    std::ranges::copy_n(u.bytes, N, to);
+}
+
+template <std::size_t N, byte_type From>
+auto byte_copy(not_pointer auto to, From* from) -> decltype(to){
+    copy_union<std::decay_t<decltype(to)>, std::decay_t<From>, N> u(to);
+    std::ranges::copy_n(from, N, u.bytes);
+    return u.from;
+}
+
+template <typename To, std::size_t Offset, std::size_t N, byte_type B>
+constexpr To bit_cast_byte_array(const B* from){
+    constexpr std::size_t data_size{sizeof(To)};
+    static_assert(data_size >= N-Offset, "byte array should be larger or same as the type provided");
+    To out{};
+    return byte_copy<data_size>(out, from+Offset);
+}
+
+template <std::size_t N, std::size_t Offset>
+constexpr std::array<std::byte, N> bit_cast_byte_array(auto from){
+    using from_type = std::decay_t<decltype(from)>;
+    constexpr std::size_t data_size{sizeof(from_type)};
+    static_assert(N-Offset >= data_size, "byte array should be larger or same as the type provided");
+    std::array<std::byte, N> out{};
+    byte_copy<data_size>(out.data()+Offset, from);
+    return out;
+}
+
 }
 
 template <typename To>
 constexpr To bit_cast(auto from){
   return details::bit_cast<To>(from);
+}
+
+template <std::size_t N, std::size_t Offset = 0>
+constexpr std::array<std::byte, N> bit_cast(auto from){
+    return details::bit_cast_byte_array<N, Offset>(from);
+}
+
+template <typename To, std::size_t Offset, byte_type B, std::size_t N>
+constexpr To bit_cast(const B* from){
+    return details::bit_cast_byte_array<To, Offset, N, B>(from);
+}
+
+template <typename To, std::size_t Offset, byte_type B, std::size_t N>
+constexpr To bit_cast(const std::array<B, N>& from){
+    return details::bit_cast_byte_array<To, Offset, N, B>(from.data());
+}
+
+template <typename To, std::size_t Offset, byte_type B, std::size_t N>
+constexpr To bit_cast(B (&from)[N]){
+    return details::bit_cast_byte_array<To, Offset, N, B>(from);
 }
 
 }
