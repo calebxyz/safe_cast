@@ -117,21 +117,7 @@ constexpr To bit_cast_size(From from) requires (not equal_size<To, From>)
 
 template <integral_bool To, arithmetic_not_bool From>
 constexpr bool bit_cast_size(From from){
-  constexpr uint8_t MASK{1};
-// clang and gcc dont agree here clang takes the least segnificant bit while gcc takes the whole number
-#ifdef __clang__
-  if constexpr (std::integral<From>) {
-    return from & MASK;
-  } else {
-    if constexpr (std::same_as<From, double>) {
-        return std::bit_cast<uint64_t>(from) & MASK;
-    } else {
-        return std::bit_cast<uint32_t>(from) & MASK;
-    }
-  }
-#else
-  return from;
-#endif  
+    return from;
 }
 
 template <arithmetic_not_bool To, integral_bool From>

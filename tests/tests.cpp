@@ -97,26 +97,21 @@ TEST(BIT_CAST, fp){
 }
 
 TEST(BIT_CAST, bool){
+    auto get_bool = [](auto n) -> bool {return n;};
+
     int64_t b1 = 0xf6;
-    bool b2 = *reinterpret_cast<bool*>(&b1);
+    bool b2 = get_bool(b1);
     bool b3 = bits::bit_cast<bool>(b1);
-#ifdef __clang__
-    EXPECT_TRUE(b2 == b3);
-#else 
-    EXPECT_TRUE(b2);
-    EXPECT_TRUE(b3);
-#endif    
+    EXPECT_EQ(b2, b3);
 
     uint32_t b4 = 0xdeadbeef;
-    b2 = *reinterpret_cast<bool*>(&b4);
+    b2 = get_bool(b4);;
     b3 = bits::bit_cast<bool>(b4);
-    EXPECT_TRUE(b2);
-    EXPECT_TRUE(b3); 
-    	
+    EXPECT_EQ(b2, b3);
 
     bool b5 = 0xbeef;
     auto utmp = static_cast<uint64_t>(b5);
-    auto u1 = *reinterpret_cast<uint64_t*>(&utmp);
+    auto u1 = get_bool(utmp);
     auto u2 = bits::bit_cast<uint64_t>(b5);
     EXPECT_EQ(u1, u2);
 
@@ -124,14 +119,14 @@ TEST(BIT_CAST, bool){
     EXPECT_EQ(b5, b6);
 
     auto f1 = 5.6556f;
-    b2 = *reinterpret_cast<bool*>(&f1);
+    b2 = get_bool(f1);
     b3 = bits::bit_cast<bool>(f1);
     EXPECT_EQ(b5, b6);
 
     auto d1 = 5.6556;
-    b2 = *reinterpret_cast<bool*>(&d1);
+    b2 = get_bool(d1);
     b3 = bits::bit_cast<bool>(d1);
-    EXPECT_EQ(b5, b6);
+    EXPECT_EQ(b2, b3);
 
     auto u3 = static_cast<uint32_t>(b5);
     auto f2 = *reinterpret_cast<float*>(&u3);
